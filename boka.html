@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Boka bil</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <h2>Boka denna bil</h2>
+  <button onclick="bokaBil()">Betala och boka</button>
+
+  <script>
+    const stripe = Stripe("pk_test_51RVEA9PGF2DBEQrzkMI9qsJPwSKNuWlPi8UDhAiGa8ecg9vhGH2nPK88b8uTFV995bAJI4EamA8eFvnPaw9vyrag00zDEvUuLG");
+
+    async function bokaBil() {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          price: 500,
+          carId: "123",
+          stripeAccountId: "acct_1XYZABC123"
+        }),
+      });
+
+      const session = await response.json();
+      await stripe.redirectToCheckout({ sessionId: session.id });
+    }
+  </script>
+</body>
+</html>
