@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Boka denna bil</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body style="background-color:#aaa">
+  <h2>Boka denna bil</h2>
+  <button onclick="startCheckout()">Betala och boka</button>
+
+  <script>
+    const stripe = Stripe("pk_test_51RVEA9PGF2DBEQrz..."); // din publika nyckel här
+
+    async function startCheckout() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const model = urlParams.get("model");
+      const reg = urlParams.get("reg");
+      const price = urlParams.get("price");
+      const stripeAccount = urlParams.get("stripe");
+
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ model, reg, price, stripeAccount })
+      });
+
+      try {
+        const data = await response.json();
+
+        if (data.id) {
+          stripe.redirectToCheckout({ sessionId: data.id });
+        } else {
+          alert("Kunde inte starta betalning. Kontrollera att all data är rätt.");
+        }
+      } catch (error) {
+        alert("Fel vid betalning. Kontrollera uppgifter eller kontakta support.");
+        console.error("Stripe error:", error);
+      }
+    }
+  </script>
+</body>
+</html>
