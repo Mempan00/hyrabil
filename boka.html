@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,24 +6,37 @@
 </head>
 <body>
   <h2>Boka denna bil</h2>
-  <button onclick="bokaBil()">Betala och boka</button>
+  <button onclick="boka()">Betala och boka</button>
 
   <script>
     const stripe = Stripe("pk_test_51RVEA9PGF2DBEQrzkMI9qsJPwSKNuWlPi8UDhAiGa8ecg9vhGH2nPK88b8uTFV995bAJI4EamA8eFvnPaw9vyrag00zDEvUuLG");
 
-    async function bokaBil() {
+    async function boka() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const model = urlParams.get("model") || "Okänd";
+      const reg = urlParams.get("reg") || "ABC123";
+      const price = parseInt(urlParams.get("price")) || 500;
+      const stripeAccountId = urlParams.get("stripe") || "acct_xxxx123"; // Testkonto
+
       const response = await fetch("/api/create-checkout-session", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-          price: 500,
-          carId: "123",
-          stripeAccountId: "acct_1XYZABC123"
-        }),
+          carId: model + " " + reg,
+          price: price,
+          stripeAccountId: stripeAccountId
+        })
       });
 
-      const session = await response.json();
-      await stripe.redirectToCheckout({ sessionId: session.id });
+      try {
+        const session = await response.json();
+        await stripe.redirectToCheckout({ sessionId: session.id });
+      } catch (error) {
+        alert("Kunde inte starta betalning. Kontrollera att all data är rätt.");
+        console.error(error);
+      }
     }
   </script>
 </body>
