@@ -1,61 +1,137 @@
 
 <!DOCTYPE html>
-
 <html lang="sv">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Boka bil</title>
-</head>
-<body>
-<h1>Boka bil</h1>
-<form id="booking-form">
-<label>Modell:</label>
-<input id="car-model" name="model" readonly="" type="text"/><br/>
-<label>Registreringsnummer:</label>
-<input id="car-reg" name="reg_number" readonly="" type="text"/><br/>
-<label for="start-date">Startdatum:</label>
-<input id="start-date" name="start_date" required="" type="date"/><br/>
-<label for="start-time">Starttid:</label>
-<input id="start-time" name="start_time" required="" type="time"/><br/>
-<label for="rental-hours">Antal timmar:</label>
-<select id="rental-hours" name="hours">
-<!-- Dynamiska alternativ baserat på priser -->
-</select><br/>
-<p id="total-price">Totalpris: 0 SEK</p>
-<button id="pay-button" type="submit">Betala</button>
-</form>
-<script>
-    // Exempeldata
-    const maxHours = 3;
-    const pricePerHour = 150;
-
-    const modelField = document.getElementById('car-model');
-    const regField = document.getElementById('car-reg');
-    const hoursSelect = document.getElementById('rental-hours');
-    const totalPriceText = document.getElementById('total-price');
-
-    // Simulera inläsning av vald bils data
-    modelField.value = "Volvo XC60";
-    regField.value = "ABC123";
-
-    for (let i = 1; i <= maxHours; i++) {
-      const option = document.createElement("option");
-      option.value = i;
-      option.text = `${i} timme${i > 1 ? 'ar' : ''}`;
-      hoursSelect.appendChild(option);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boka bil</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f2f2f2;
+      padding: 20px;
     }
 
-    hoursSelect.addEventListener('change', () => {
-      const hours = parseInt(hoursSelect.value);
-      const total = hours * pricePerHour;
-      totalPriceText.textContent = `Totalpris: ${total} SEK`;
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #1a73e8;
+      color: white;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1669c1;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Boka bil</h1>
+
+  <form id="bookingForm">
+    <label for="model">Bilmodell</label>
+    <input type="text" id="model" name="model" readonly>
+
+    <label for="regNumber">Registreringsnummer</label>
+    <input type="text" id="regNumber" name="regNumber" readonly>
+
+    <label for="location">Plats</label>
+    <input type="text" id="location" name="location" readonly>
+
+    <label for="date">Datum</label>
+    <input type="date" id="date" name="date" required>
+
+    <label for="startTime">Starttid</label>
+    <input type="time" id="startTime" name="startTime" required>
+
+    <label for="hours">Antal timmar</label>
+    <select id="hours" name="hours" required>
+      <option value="">Välj antal timmar</option>
+    </select>
+
+    <button type="submit">Betala & Boka</button>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const SUPABASE_URL = 'https://yjybfntbsjkvnqlhpfin.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prd...';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const hourSelect = document.getElementById('hours');
+    for (let i = 1; i <= 24; i++) {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = `${i} timme${i > 1 ? 'r' : ''}`;
+      hourSelect.appendChild(option);
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const model = document.getElementById('model').value;
+      const regNumber = document.getElementById('regNumber').value;
+      const location = document.getElementById('location').value;
+      const date = document.getElementById('date').value;
+      const startTime = document.getElementById('startTime').value;
+      const hours = parseInt(document.getElementById('hours').value);
+
+      const { data, error } = await supabase
+        .from('Bookings')
+        .insert([{ 
+          Model: model, 
+          Reg_number: regNumber,
+          Location: location, 
+          Date: date, 
+          Start_time: startTime, 
+          Hours: hours
+        }]);
+
+      if (error) {
+        alert('Fel vid bokning: ' + error.message);
+      } else {
+        alert('Bokningen är klar!');
+        window.location.href = 'tack.html';
+      }
     });
 
-    document.getElementById("booking-form").addEventListener("submit", (e) => {
-      e.preventDefault();
-      alert("Skickar till Stripe Checkout...");
-    });
+    const urlParams = new URLSearchParams(window.location.search);
+    const model = urlParams.get('model');
+    const location = urlParams.get('location');
+    const regNumber = urlParams.get('reg');
+
+    if (model) document.getElementById('model').value = model;
+    if (location) document.getElementById('location').value = location;
+    if (regNumber) document.getElementById('regNumber').value = regNumber;
   </script>
+
 </body>
 </html>
