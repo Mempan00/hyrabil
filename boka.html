@@ -1,79 +1,60 @@
+
 <!DOCTYPE html>
+
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <title>Boka bil</title>
-  <script src="https://js.stripe.com/v3/"></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Boka bil</title>
 </head>
 <body>
-  <h1>Boka bil</h1>
+<h1>Boka bil</h1>
+<form id="booking-form">
+<label>Modell:</label>
+<input id="car-model" name="model" readonly="" type="text"/><br/>
+<label>Registreringsnummer:</label>
+<input id="car-reg" name="reg_number" readonly="" type="text"/><br/>
+<label for="start-date">Startdatum:</label>
+<input id="start-date" name="start_date" required="" type="date"/><br/>
+<label for="start-time">Starttid:</label>
+<input id="start-time" name="start_time" required="" type="time"/><br/>
+<label for="rental-hours">Antal timmar:</label>
+<select id="rental-hours" name="hours">
+<!-- Dynamiska alternativ baserat på priser -->
+</select><br/>
+<p id="total-price">Totalpris: 0 SEK</p>
+<button id="pay-button" type="submit">Betala</button>
+</form>
+<script>
+    // Exempeldata
+    const maxHours = 3;
+    const pricePerHour = 150;
 
-  <!-- Formulär -->
-  <label>Startdatum: <input type="date" id="startDate"></label><br>
-  <label>Starttid: <input type="time" id="startTime"></label><br>
+    const modelField = document.getElementById('car-model');
+    const regField = document.getElementById('car-reg');
+    const hoursSelect = document.getElementById('rental-hours');
+    const totalPriceText = document.getElementById('total-price');
 
-  <label>Bilmodell: <input type="text" id="carModel" readonly></label><br>
-  <label>Reg. nummer: <input type="text" id="regNumber" readonly></label><br>
+    // Simulera inläsning av vald bils data
+    modelField.value = "Volvo XC60";
+    regField.value = "ABC123";
 
-  <label>Välj antal timmar:
-    <select id="hoursSelect">
-      <option value="1">1 timme</option>
-      <option value="2">2 timmar</option>
-      <option value="3">3 timmar</option>
-      <option value="4">4 timmar</option>
-      <option value="5">5 timmar</option>
-      <option value="6">6 timmar</option>
-      <option value="7">7 timmar</option>
-      <option value="8">8 timmar</option>
-    </select>
-  </label><br>
-
-  <label>Pris (kr): <input type="text" id="price" readonly></label><br><br>
-
-  <button id="pay-button">Betala och boka</button>
-
-  <script>
-    const stripe = Stripe('pk_test_YOUR_PUBLIC_KEY');
-
-    const query = new URLSearchParams(window.location.search);
-    const model = query.get("model");
-    const reg = query.get("reg");
-    const pricePerHour = parseInt(query.get("price")) || 0;
-
-    document.getElementById("carModel").value = model || "";
-    document.getElementById("regNumber").value = reg || "";
-
-    const hoursSelect = document.getElementById("hoursSelect");
-    const priceInput = document.getElementById("price");
-
-    function updatePrice() {
-      const hours = parseInt(hoursSelect.value);
-      priceInput.value = hours * pricePerHour;
+    for (let i = 1; i <= maxHours; i++) {
+      const option = document.createElement("option");
+      option.value = i;
+      option.text = `${i} timme${i > 1 ? 'ar' : ''}`;
+      hoursSelect.appendChild(option);
     }
 
-    hoursSelect.addEventListener("change", updatePrice);
-    updatePrice();
+    hoursSelect.addEventListener('change', () => {
+      const hours = parseInt(hoursSelect.value);
+      const total = hours * pricePerHour;
+      totalPriceText.textContent = `Totalpris: ${total} SEK`;
+    });
 
-    document.getElementById("pay-button").addEventListener("click", async () => {
-      const amount = parseInt(priceInput.value);
-      if (!amount) return alert("Pris saknas.");
-
-      const response = await fetch("https://stripe-backend-1-rqtt.onrender.com/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: amount * 100,
-          success_url: window.location.origin + "/success.html",
-          cancel_url: window.location.origin + "/cancel.html",
-        }),
-      });
-
-      const data = await response.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert("Fel vid betalning: " + (data.error || "okänt fel"));
-      }
+    document.getElementById("booking-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      alert("Skickar till Stripe Checkout...");
     });
   </script>
 </body>
