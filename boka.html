@@ -1,73 +1,50 @@
-
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Boka bil</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f5f5f5;
-    }
-    .card {
-      background: white;
-      border-radius: 5px;
-      padding: 20px;
-      max-width: 500px;
-      margin: auto;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-  </style>
+  <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
-  <div class="card">
-    <h1>Bekräfta bokning</h1>
-    <p>Bilmodell: Volvo XC60</p>
-    <p>Datum: 5 juni 2025</p>
-    <p>Pris: 500 kr</p>
-    <button id="pay-button">Betala</button>
-  </div>
+  <h1>Boka bil</h1>
+  <p>Model: <span id="model"></span></p>
+  <p>Registreringsnummer: <span id="reg"></span></p>
+  <button id="payButton">Betala</button>
 
-  <!-- Stripe.js -->
-  <script src="https://js.stripe.com/v3/"></script>
   <script>
-    const stripe = Stripe("pk_test_51RVEA9PGF2DBEQrzkMI9qsJPwSKNuWlPi8UDhAiGa8ecg9vhGH2nPK88b8uTFV995bAJI4EamA8eFvnPaw9vyrag00zDEvUuLG");
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const model = params.get("model");
+      const reg = params.get("reg");
 
-    document.getElementById("pay-button").addEventListener("click", async () => {
-      const response = await fetch("https://din-backend-url.com/create-checkout-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          amount: 50000,
-          success_url: "https://dinwebbplats.se/success.html",
-          cancel_url: "https://dinwebbplats.se/cancel.html"
-        })
+      document.getElementById("model").textContent = model || "Okänd";
+      document.getElementById("reg").textContent = reg || "Okänt";
+
+      document.getElementById("payButton").addEventListener("click", async () => {
+        try {
+          const response = await fetch("https://stripe-backend-1-rqtt.onrender.com/create-checkout-session", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              amount: 99900,
+              success_url: window.location.origin + "/boka.html?success=true",
+              cancel_url: window.location.origin + "/boka.html?canceled=true"
+            })
+          });
+
+          const data = await response.json();
+          if (data.url) {
+            window.location.href = data.url;
+          } else {
+            alert("Kunde inte skapa betalningssession.");
+          }
+        } catch (err) {
+          console.error("Fel vid betalning:", err);
+          alert("Ett fel uppstod vid betalning.");
+        }
       });
-
-      const session = await response.json();
-
-      if (session.url) {
-        window.location.href = session.url;
-      } else {
-        alert("Något gick fel. Försök igen.");
-        console.error(session);
-      }
     });
   </script>
 </body>
