@@ -13,16 +13,16 @@
       margin: 0;
       background-color: #f8f9fa;
       text-align: center;
-      padding: 100px 20px;
+      padding: 40px 20px;
     }
 
     h1 {
       font-size: 60px;
-      margin-bottom: 60px;
+      margin-bottom: 40px;
     }
 
     .logo-container {
-      margin-bottom: 50px;
+      margin-bottom: 30px;
     }
 
     .logo-container img {
@@ -30,9 +30,16 @@
       height: auto;
     }
 
+    input[type="text"] {
+      max-width: 500px;
+    }
+
+    input[type="datetime-local"] {
+      max-width: 300px;
+    }
+
     input[type="text"],
-    input[type="date"],
-    input[type="time"] {
+    input[type="datetime-local"] {
       width: 98%;
       max-width: 700px;
       padding: 28px;
@@ -45,15 +52,8 @@
     .row {
       display: flex;
       justify-content: center;
-      gap: 60px;
+      gap: 40px;
       flex-wrap: wrap;
-      align-items: flex-start;
-      margin-bottom: 30px;
-    }
-
-    .column {
-      display: flex;
-      flex-direction: column;
       align-items: center;
     }
 
@@ -61,7 +61,6 @@
       width: 100px;
       height: 100px;
       cursor: pointer;
-      margin-bottom: 10px;
     }
 
     button {
@@ -76,7 +75,7 @@
 
     .top-buttons {
       text-align: right;
-      margin-bottom: 60px;
+      margin-bottom: 20px;
     }
 
     .top-buttons button {
@@ -123,17 +122,9 @@
   <h1>Sök bil</h1>
 
   <input type="text" id="locationInput" placeholder="Ange plats" />
+  <input type="datetime-local" id="datetimeInput" />
 
-  <div class="row">
-    <div class="column">
-      <img src="images/calendar.png" alt="Kalender" class="icon" onclick="document.getElementById('dateInput').focus()" />
-      <input type="date" id="dateInput" />
-    </div>
-    <div class="column">
-      <img src="images/starttid-klocka.png" alt="Starttid" class="icon" onclick="document.getElementById('timeInput').focus()" />
-      <input type="time" id="timeInput" />
-    </div>
-  </div>
+  <br />
 
   <button id="sökKnapp">Sök</button>
 
@@ -141,8 +132,7 @@
 
   <script>
     const input = document.getElementById("locationInput");
-    const dateInput = document.getElementById("dateInput");
-    const timeInput = document.getElementById("timeInput");
+    const datetimeInput = document.getElementById("datetimeInput");
     const carResults = document.getElementById("carResults");
 
     const supabase = window.supabase.createClient(
@@ -160,37 +150,12 @@
       });
     }
 
-    function isDateInRange(selectedDate, rangeString) {
-      const monthMap = {
-        januari: '01', februari: '02', mars: '03',
-        april: '04', maj: '05', juni: '06',
-        juli: '07', augusti: '08', september: '09',
-        oktober: '10', november: '11', december: '12'
-      };
-
-      const match = rangeString.match(/(\d+)[–-](\d+)\s+(\w+)\s+(\d{4})/);
-      if (!match) return false;
-
-      const [, startDay, endDay, monthSv, year] = match;
-      const month = monthMap[monthSv.toLowerCase()];
-      if (!month) return false;
-
-      const selected = new Date(selectedDate);
-      const start = new Date(`${year}-${month}-${startDay.padStart(2, '0')}`);
-      const end = new Date(`${year}-${month}-${endDay.padStart(2, '0')}`);
-
-      return selected >= start && selected <= end;
-    }
-
     document.getElementById("sökKnapp").addEventListener("click", async () => {
       const plats = input.value.toLowerCase();
-      const datum = dateInput.value;
-      const starttid = timeInput.value;
+      const datetimeStr = datetimeInput.value;
+      const datetime = datetimeStr ? new Date(datetimeStr) : null;
 
-      let { data: cars, error } = await supabase
-        .from("Cars")
-        .select("*");
-
+      let { data: cars, error } = await supabase.from("Cars").select("*");
       if (error) {
         carResults.innerHTML = "<p>Fel vid hämtning av bilar.</p>";
         return;
@@ -198,9 +163,28 @@
 
       const filtrerade = cars.filter(car => {
         const platsMatch = !plats || (car.Location && car.Location.toLowerCase().includes(plats));
-        const datumMatch = !datum || (car.Available_dates && isDateInRange(datum, car.Available_dates));
-        const tidMatch = !starttid || (car.Available_times && car.Available_times.includes(starttid));
-        return platsMatch && datumMatch && tidMatch;
+
+        let dateMatch = true;
+        let timeMatch = true;
+
+        if (datetime) {
+          const fromDate = car.available_from ? new Date(car.available_from) : null;
+          const toDate = car.available_to ? new Date(car.available_to) : null;
+
+          if (fromDate && toDate) {
+            dateMatch = datetime >= fromDate && datetime <= toDate;
+          }
+
+          const selectedHour = datetime.getHours();
+          const startHour = car.start_time ? parseInt(car.start_time.split(":")[0]) : null;
+          const endHour = car.end_time ? parseInt(car.end_time.split(":")[0]) : null;
+
+          if (startHour !== null && endHour !== null) {
+            timeMatch = selectedHour >= startHour && selectedHour <= endHour;
+          }
+        }
+
+        return platsMatch && dateMatch && timeMatch;
       });
 
       if (filtrerade.length === 0) {
@@ -213,7 +197,8 @@
           <h2>${car.Model}</h2>
           <p><strong>Plats:</strong> ${car.Location}</p>
           <p><strong>Reg.nr:</strong> ${car.Reg_number}</p>
-          <p><strong>Tillgänglig:</strong> ${car.Available_dates || "Okänt datum"}</p>
+          <p><strong>Tillgänglig:</strong> ${car.available_from} – ${car.available_to}</p>
+          <p><strong>Tider:</strong> ${car.start_time} – ${car.end_time}</p>
           <img src="${car.Image_url}" alt="${car.Model}" />
         </div>
       `).join("");
