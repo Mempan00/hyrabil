@@ -3,7 +3,6 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sök bil</title>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0BCvW8uNDXkb6Q4uToK1Q8EpPpcEH0Vg&libraries=places"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -117,12 +116,12 @@
   <input type="text" id="locationInput" placeholder="Ange plats" />
 
   <div class="row">
-    <img src="images/calendar.png" alt="Kalender" class="icon" onclick="document.getElementById('dateInput').showPicker()" />
-    <img src="images/starttid-klocka.png" alt="Starttid" class="icon" onclick="document.getElementById('timeInput').showPicker()" />
+    <img src="images/calendar.png" alt="Kalender" class="icon" onclick="document.getElementById('dateInput').focus()" />
+    <img src="images/starttid-klocka.png" alt="Starttid" class="icon" onclick="document.getElementById('timeInput').focus()" />
   </div>
 
-  <input type="date" id="dateInput" style="display:none;" />
-  <input type="time" id="timeInput" style="display:none;" />
+  <input type="date" id="dateInput" />
+  <input type="time" id="timeInput" />
 
   <br />
 
