@@ -7,44 +7,73 @@
 </head>
 <body>
   <h1>Boka bil</h1>
-  <p>Model: <span id="model"></span></p>
-  <p>Registreringsnummer: <span id="reg"></span></p>
-  <button id="payButton">Betala</button>
+
+  <!-- Formulär -->
+  <label>Startdatum: <input type="date" id="startDate"></label><br>
+  <label>Starttid: <input type="time" id="startTime"></label><br>
+
+  <label>Bilmodell: <input type="text" id="carModel" readonly></label><br>
+  <label>Reg. nummer: <input type="text" id="regNumber" readonly></label><br>
+
+  <label>Välj antal timmar:
+    <select id="hoursSelect">
+      <option value="1">1 timme</option>
+      <option value="2">2 timmar</option>
+      <option value="3">3 timmar</option>
+      <option value="4">4 timmar</option>
+      <option value="5">5 timmar</option>
+      <option value="6">6 timmar</option>
+      <option value="7">7 timmar</option>
+      <option value="8">8 timmar</option>
+    </select>
+  </label><br>
+
+  <label>Pris (kr): <input type="text" id="price" readonly></label><br><br>
+
+  <button id="pay-button">Betala och boka</button>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const params = new URLSearchParams(window.location.search);
-      const model = params.get("model");
-      const reg = params.get("reg");
+    const stripe = Stripe('pk_test_YOUR_PUBLIC_KEY');
 
-      document.getElementById("model").textContent = model || "Okänd";
-      document.getElementById("reg").textContent = reg || "Okänt";
+    const query = new URLSearchParams(window.location.search);
+    const model = query.get("model");
+    const reg = query.get("reg");
+    const pricePerHour = parseInt(query.get("price")) || 0;
 
-      document.getElementById("payButton").addEventListener("click", async () => {
-        try {
-          const response = await fetch("https://stripe-backend-1-rqtt.onrender.com/create-checkout-session", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              amount: 99900,
-              success_url: window.location.origin + "/boka.html?success=true",
-              cancel_url: window.location.origin + "/boka.html?canceled=true"
-            })
-          });
+    document.getElementById("carModel").value = model || "";
+    document.getElementById("regNumber").value = reg || "";
 
-          const data = await response.json();
-          if (data.url) {
-            window.location.href = data.url;
-          } else {
-            alert("Kunde inte skapa betalningssession.");
-          }
-        } catch (err) {
-          console.error("Fel vid betalning:", err);
-          alert("Ett fel uppstod vid betalning.");
-        }
+    const hoursSelect = document.getElementById("hoursSelect");
+    const priceInput = document.getElementById("price");
+
+    function updatePrice() {
+      const hours = parseInt(hoursSelect.value);
+      priceInput.value = hours * pricePerHour;
+    }
+
+    hoursSelect.addEventListener("change", updatePrice);
+    updatePrice();
+
+    document.getElementById("pay-button").addEventListener("click", async () => {
+      const amount = parseInt(priceInput.value);
+      if (!amount) return alert("Pris saknas.");
+
+      const response = await fetch("https://stripe-backend-1-rqtt.onrender.com/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: amount * 100,
+          success_url: window.location.origin + "/success.html",
+          cancel_url: window.location.origin + "/cancel.html",
+        }),
       });
+
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Fel vid betalning: " + (data.error || "okänt fel"));
+      }
     });
   </script>
 </body>
