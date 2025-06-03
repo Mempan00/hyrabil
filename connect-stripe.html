@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <title>Koppla Stripekonto</title>
+</head>
+<body>
+  <h2>Koppla ditt Stripekonto</h2>
+  <button id="connectStripe">Koppla mitt Stripekonto</button>
+
+  <script>
+    document.getElementById('connectStripe').addEventListener('click', async () => {
+      const response = await fetch('/.netlify/functions/create-stripe-account');
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Misslyckades att hämta Stripe-länk.');
+      }
+    });
+  </script>
+</body>
+</html>

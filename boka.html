@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Boka bil</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <h1>Boka bil</h1>
+
+  <!-- Formulärfält -->
+  <label>Startdatum: <input type="date" id="startDate"></label><br>
+  <label>Starttid: <input type="time" id="startTime"></label><br>
+  <label>Sluttid: <input type="time" id="endTime"></label><br>
+  <label>Bilmodell: <input type="text" id="carModel" value="Testmodell" readonly></label><br>
+  <label>Reg. nummer: <input type="text" id="regNumber" value="ABC123" readonly></label><br>
+  <label>Pris (kr): <input type="number" id="price" value="100" readonly></label><br><br>
+
+  <!-- Stripe Checkout-knapp -->
+  <button id="pay-button">Betala och boka</button>
+
+  <script>
+    const stripe = Stripe('pk_test_YOUR_PUBLIC_KEY');
+
+    document.getElementById("pay-button").addEventListener("click", async () => {
+      // Spara bokningsinfo i localStorage så vi kan hämta på success-sidan
+      localStorage.setItem("carModel", document.getElementById("carModel").value);
+      localStorage.setItem("regNumber", document.getElementById("regNumber").value);
+      localStorage.setItem("startDate", document.getElementById("startDate").value);
+      localStorage.setItem("startTime", document.getElementById("startTime").value);
+      localStorage.setItem("endTime", document.getElementById("endTime").value);
+      localStorage.setItem("price", document.getElementById("price").value);
+
+      const response = await fetch("/.netlify/functions/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: parseInt(document.getElementById("price").value) * 100, // omvandla till öre
+          description: "Bilbokning: " + document.getElementById("carModel").value
+        }),
+      });
+
+      const data = await response.json();
+      if (data.id) {
+        stripe.redirectToCheckout({ sessionId: data.id });
+      } else {
+        alert("Något gick fel: " + data.error);
+      }
+    });
+  </script>
+</body>
+</html>

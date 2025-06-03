@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Logga in</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    input { padding: 8px; margin: 6px 0; width: 250px; }
+    button { padding: 10px 20px; }
+    #meddelande { margin-top: 20px; color: red; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+<style>
+.main-container {
+    padding-top: 80px;
+}
+</style>
+<div class="main-container">
+
+<a href="index.html" style="position: absolute; top: 20px; left: 20px; text-decoration: none;">
+    <button style="padding: 6px 12px;">Tillbaka till startsidan</button>
+</a>
+
+  <h2>Logga in</h2>
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="E-post" required><br>
+    <input type="password" id="lösenord" placeholder="Lösenord" required><br>
+    <button type="submit">Logga in</button>
+  </form>
+  <p id="meddelande"></p>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAWnm3zs40aVmJMNr78KlGHUzYESMYz4Ds",
+      authDomain: "reg-hyrabil.firebaseapp.com",
+      projectId: "reg-hyrabil",
+      storageBucket: "reg-hyrabil.appspot.com",
+      messagingSenderId: "467334843795",
+      appId: "1:467334843795:web:4d4dab5e734363d468ec66"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    document.getElementById("loginForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const lösenord = document.getElementById("lösenord").value;
+      const msg = document.getElementById("meddelande");
+
+      try {
+        await auth.signInWithEmailAndPassword(email, lösenord);
+        msg.style.color = "green";
+        msg.innerText = "Inloggad! Omdirigerar...";
+        setTimeout(() => {
+          window.location.href = "inloggad.html";
+        }, 1000);
+      } catch (error) {
+        msg.style.color = "red";
+        msg.innerText = "Fel: " + error.message;
+      }
+    });
+  </script>
+</div>
+</body>
+</html>
