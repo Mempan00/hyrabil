@@ -66,7 +66,11 @@
     }
 
     .top-buttons {
+      text-align: right;
+      margin-bottom: 60px;
+    }
 
+    .top-buttons button {
       margin-left: 16px;
       font-size: 24px;
       padding: 16px 32px;
@@ -112,12 +116,16 @@
   <input type="text" id="locationInput" placeholder="Ange plats" />
 
   <div class="row">
-    <img src="images/calendar.png" alt="Kalender" class="icon" onclick="document.getElementById('dateInput').click()" />
-    <img src="images/starttid-klocka.png" alt="Starttid" class="icon" onclick="document.getElementById('timeInput').click()" />
+    <label for="dateInput">
+      <img src="images/calendar.png" alt="Kalender" class="icon" />
+    </label>
+    <label for="timeInput">
+      <img src="images/starttid-klocka.png" alt="Starttid" class="icon" />
+    </label>
   </div>
 
-  <input type="date" id="dateInput" style="display:none;" />
-  <input type="time" id="timeInput" style="display:none;" />
+  <input type="date" id="dateInput" />
+  <input type="time" id="timeInput" />
 
   <br />
 
