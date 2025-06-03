@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -115,12 +116,8 @@
   <input type="text" id="locationInput" placeholder="Ange plats" />
 
   <div class="row">
-    <div onclick="document.getElementById('dateInput').showPicker()">
-      <img src="images/calendar.png" alt="Kalender" class="icon" />
-    </div>
-    <div onclick="document.getElementById('timeInput').showPicker()">
-      <img src="images/starttid-klocka.png" alt="Starttid" class="icon" />
-    </div>
+    <img src="images/calendar.png" alt="Kalender" class="icon" onclick="document.getElementById('dateInput').click()" />
+    <img src="images/starttid-klocka.png" alt="Starttid" class="icon" onclick="document.getElementById('timeInput').click()" />
   </div>
 
   <input type="date" id="dateInput" style="display:none;" />
