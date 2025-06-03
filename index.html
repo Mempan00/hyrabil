@@ -150,6 +150,15 @@
       });
     }
 
+    function isDateInRange(selectedDate, rangeString) {
+      const match = rangeString.match(/(\d{4}-\d{2}-\d{2})\s*till\s*(\d{4}-\d{2}-\d{2})/);
+      if (!match) return false;
+      const start = new Date(match[1]);
+      const end = new Date(match[2]);
+      const selected = new Date(selectedDate);
+      return selected >= start && selected <= end;
+    }
+
     document.getElementById("sökKnapp").addEventListener("click", async () => {
       const plats = input.value.toLowerCase();
       const datum = dateInput.value;
@@ -166,8 +175,8 @@
 
       const filtrerade = cars.filter(car => {
         const platsMatch = !plats || (car.Location && car.Location.toLowerCase().includes(plats));
-        const datumMatch = !datum || (car.Available_dates && car.Available_dates === datum);
-        const tidMatch = !starttid || (car.Available_times && car.Available_times === starttid);
+        const datumMatch = !datum || (car.Available_dates && isDateInRange(datum, car.Available_dates));
+        const tidMatch = !starttid || (car.Available_times && car.Available_times.includes(starttid));
         return platsMatch && datumMatch && tidMatch;
       });
 
