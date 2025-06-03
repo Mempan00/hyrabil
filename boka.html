@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Boka bil</title>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <h2>Boka bil</h2>
+    <p>Tryck på knappen för att gå vidare till betalning.</p>
+    <button id="checkout-button">Betala</button>
+
+    <script>
+        const stripe = Stripe("pk_test_51RVEA9PGF2DBEQrzkMI9qsJPwSKNuWlPi8UDhAiGa8ecg9vhGH2nPK88b8uTFV995bAJI4EamA8eFvnPaw9vyrag00zDEvUuLG");
+
+        document.getElementById("checkout-button").addEventListener("click", function () {
+            fetch("https://stripe-backend-1-rqtt.onrender.com/create-checkout-session", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    product: "Hyrbil",
+                    amount: 50000  // 500 kr i öre
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                return stripe.redirectToCheckout({ sessionId: data.id });
+            })
+            .then(result => {
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>
