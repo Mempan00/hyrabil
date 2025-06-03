@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sök bil</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0BCvW8uNDXkb6Q4uToK1Q8EpPpcEH0Vg&libraries=places"></script>
+</head>
+<body>
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="login.html"><button style="padding: 10px 20px; font-size: 16px;">Logga in</button></a>
+    <a href="skapa-konto.html"><button style="padding: 10px 20px; font-size: 16px; margin-left: 10px;">Skapa konto</button></a>
+</div>
+
+  <h1>Sök bil</h1>
+  <input type="text" id="locationInput" placeholder="Ange plats" />
+  <input type="date" id="dateInput" />
+  <button id="sökKnapp">Sök</button>
+  <div id="searchResults" style="margin-top: 20px;"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.6/dist/umd/supabase.min.js"></script>
+  <script>
+    const input = document.getElementById("locationInput");
+    if (input) {
+      const autocomplete = new google.maps.places.Autocomplete(input);
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (place && place.formatted_address) {
+          input.value = place.formatted_address;
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const supabase = window.supabase.createClient(
+        "https://yjybfntbsjkvnqlhpfin.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k"
+      );
+
+      async function searchCars() {
+        const input = document.getElementById("locationInput");
+        const dateInput = document.getElementById("dateInput");
+        const resultsDiv = document.getElementById("searchResults");
+
+        if (!input || !resultsDiv) return;
+
+        const searchValue = input.value.toLowerCase().trim();
+        const dateValue = dateInput.value;
+        const selectedDate = dateValue ? new Date(dateValue) : null;
+
+        const { data, error } = await supabase.from("Cars").select("*");
+
+        if (error) {
+          resultsDiv.innerHTML = "<p>Fel vid hämtning.</p>";
+          return;
+        }
+
+        let filtered = data.filter(car => {
+          const locationMatch = car.Location && car.Location.toLowerCase().includes(searchValue);
+          return locationMatch;
+        });
+
+        if (selectedDate) {
+          filtered = filtered.filter(car => {
+            const availableStart = new Date("2025-06-01");
+            const availableEnd = new Date("2025-06-05");
+            return selectedDate >= availableStart && selectedDate <= availableEnd;
+          });
+        }
+
+        resultsDiv.innerHTML = "";
+
+        if (filtered.length === 0) {
+          resultsDiv.innerHTML = "<p>Inga bilar hittades.</p>";
+          return;
+        }
+
+        filtered.forEach(car => {
+          console.log("Model:", car.Model, "Reg:", car.Reg_number);
+          const div = document.createElement("div");
+          div.innerHTML = `
+            <div style="border: 1px solid #ccc; padding: 12px; margin-bottom: 16px; border-radius: 6px;">
+              <h3>${car.Model}</h3>
+              <img src="${car.Image_url}" width="200" />
+              <p><strong>Reg.nr:</strong> ${car.Reg_number || "Saknas"}</p>
+              <p><strong>Plats:</strong> ${car.Location}</p>
+              <p><strong>Pris:</strong> 99 kr/timme</p>
+              <details>
+                <summary>Prislista</summary>
+                <ul>
+                  <li>1 timme: 99 kr</li>
+                  <li>3 timmar: 249 kr</li>
+                  <li>12 timmar: 499 kr</li>
+                  <li>24 timmar: 899 kr</li>
+                </ul>
+              </details>
+              <p><strong>Tillgänglig:</strong> 1–5 juni 2025</p>
+              <button onclick="window.location.href='boka.html?model=${encodeURIComponent(car.Model)}&reg=${encodeURIComponent(car.Reg_number || '')}'">Boka</button>
+            </div>
+          `;
+          resultsDiv.appendChild(div);
+        });
+      }
+
+      const button = document.getElementById("sökKnapp");
+      if (button) {
+        button.addEventListener("click", searchCars);
+      }
+    });
+  </script>
+</body>
+</html>
