@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -112,11 +113,6 @@
   <h1>Sök bil</h1>
 
   <input type="text" id="locationInput" placeholder="Ange plats" />
-
-  <div class="row">
-    <img src="images/calendar.png" alt="Datum & tid" class="icon" onclick="document.getElementById('datetimeInput').showPicker()" />
-  </div>
-
   <input type="datetime-local" id="datetimeInput" />
 
   <br />
@@ -145,23 +141,11 @@
       });
     }
 
-    function isDateInRange(selectedDateTime, rangeString) {
-      const selectedDate = new Date(selectedDateTime);
-      const match = rangeString.match(/(\d{4}-\d{2}-\d{2})\s*till\s*(\d{4}-\d{2}-\d{2})/);
-      if (!match) return false;
-      const start = new Date(match[1]);
-      const end = new Date(match[2]);
-      return selectedDate >= start && selectedDate <= end;
-    }
-
     document.getElementById("sökKnapp").addEventListener("click", async () => {
       const plats = input.value.toLowerCase();
-      const datetime = datetimeInput.value;
+      const datetime = new Date(datetimeInput.value);
 
-      let { data: cars, error } = await supabase
-        .from("Cars")
-        .select("*");
-
+      let { data: cars, error } = await supabase.from("Cars").select("*");
       if (error) {
         carResults.innerHTML = "<p>Fel vid hämtning av bilar.</p>";
         return;
@@ -169,8 +153,16 @@
 
       const filtrerade = cars.filter(car => {
         const platsMatch = !plats || (car.Location && car.Location.toLowerCase().includes(plats));
-        const datumMatch = !datetime || (car.Available_dates && isDateInRange(datetime, car.Available_dates));
-        return platsMatch && datumMatch;
+        const dateMatch = !datetime || (
+          car.available_from && car.available_to &&
+          new Date(car.available_from) <= datetime && new Date(car.available_to) >= datetime
+        );
+        const timeMatch = !datetime || (
+          car.start_time && car.end_time &&
+          datetime.getHours() >= parseInt(car.start_time.split(":")[0]) &&
+          datetime.getHours() <= parseInt(car.end_time.split(":")[0])
+        );
+        return platsMatch && dateMatch && timeMatch;
       });
 
       if (filtrerade.length === 0) {
@@ -183,7 +175,8 @@
           <h2>${car.Model}</h2>
           <p><strong>Plats:</strong> ${car.Location}</p>
           <p><strong>Reg.nr:</strong> ${car.Reg_number}</p>
-          <p><strong>Tillgänglig:</strong> ${car.Available_dates || "Okänt datum"}</p>
+          <p><strong>Tillgänglig:</strong> ${car.available_from} – ${car.available_to}</p>
+          <p><strong>Tider:</strong> ${car.start_time} – ${car.end_time}</p>
           <img src="${car.Image_url}" alt="${car.Model}" />
         </div>
       `).join("");
