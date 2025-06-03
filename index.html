@@ -165,7 +165,7 @@
       const starttid = timeInput.value;
 
       let { data: cars, error } = await supabase
-        .from("Hyr-dinbil")
+        .from("Cars")
         .select("*");
 
       if (error) {
