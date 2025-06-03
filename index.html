@@ -116,16 +116,12 @@
   <input type="text" id="locationInput" placeholder="Ange plats" />
 
   <div class="row">
-    <label for="dateInput">
-      <img src="images/calendar.png" alt="Kalender" class="icon" />
-    </label>
-    <label for="timeInput">
-      <img src="images/starttid-klocka.png" alt="Starttid" class="icon" />
-    </label>
+    <img src="images/calendar.png" alt="Kalender" class="icon" onclick="document.getElementById('dateInput').showPicker()" />
+    <img src="images/starttid-klocka.png" alt="Starttid" class="icon" onclick="document.getElementById('timeInput').showPicker()" />
   </div>
 
-  <input type="date" id="dateInput" />
-  <input type="time" id="timeInput" />
+  <input type="date" id="dateInput" style="display:none;" />
+  <input type="time" id="timeInput" style="display:none;" />
 
   <br />
 
@@ -155,11 +151,24 @@
     }
 
     function isDateInRange(selectedDate, rangeString) {
-      const match = rangeString.match(/(\d{4}-\d{2}-\d{2})\s*till\s*(\d{4}-\d{2}-\d{2})/);
+      const monthMap = {
+        januari: '01', februari: '02', mars: '03',
+        april: '04', maj: '05', juni: '06',
+        juli: '07', augusti: '08', september: '09',
+        oktober: '10', november: '11', december: '12'
+      };
+
+      const match = rangeString.match(/(\d+)[–-](\d+)\s+(\w+)\s+(\d{4})/);
       if (!match) return false;
-      const start = new Date(match[1]);
-      const end = new Date(match[2]);
+
+      const [, startDay, endDay, monthSv, year] = match;
+      const month = monthMap[monthSv.toLowerCase()];
+      if (!month) return false;
+
       const selected = new Date(selectedDate);
+      const start = new Date(`${year}-${month}-${startDay.padStart(2, '0')}`);
+      const end = new Date(`${year}-${month}-${endDay.padStart(2, '0')}`);
+
       return selected >= start && selected <= end;
     }
 
