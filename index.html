@@ -14,17 +14,21 @@
       text-align: center;
       padding: 100px 20px;
     }
+
     h1 {
       font-size: 60px;
       margin-bottom: 60px;
     }
+
     .logo-container {
       margin-bottom: 50px;
     }
+
     .logo-container img {
       max-width: 350px;
       height: auto;
     }
+
     input[type="text"],
     input[type="date"],
     input[type="time"] {
@@ -36,6 +40,7 @@
       border: 1px solid #ccc;
       margin-bottom: 30px;
     }
+
     .row {
       display: flex;
       justify-content: center;
@@ -43,11 +48,13 @@
       flex-wrap: wrap;
       align-items: center;
     }
+
     .icon {
       width: 100px;
       height: 100px;
       cursor: pointer;
     }
+
     button {
       padding: 30px 70px;
       font-size: 32px;
@@ -57,11 +64,9 @@
       color: white;
       cursor: pointer;
     }
+
     .top-buttons {
-      text-align: right;
-      margin-bottom: 60px;
-    }
-    .top-buttons button {
+
       margin-left: 16px;
       font-size: 24px;
       padding: 16px 32px;
@@ -70,9 +75,11 @@
       color: #1967d2;
       border: none;
     }
+
     .car-results {
       margin-top: 60px;
     }
+
     .car-card {
       background: white;
       padding: 20px;
@@ -82,6 +89,7 @@
       box-shadow: 0 0 12px rgba(0,0,0,0.1);
       text-align: left;
     }
+
     .car-card img {
       max-width: 100%;
       border-radius: 10px;
@@ -89,6 +97,7 @@
   </style>
 </head>
 <body>
+
   <div class="top-buttons">
     <a href="login.html"><button>Logga in</button></a>
     <a href="skapa-konto.html"><button>Skapa konto</button></a>
@@ -124,7 +133,7 @@
 
     const supabase = window.supabase.createClient(
       "https://yjybfntbsjkvnqlhpfin.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzgxMTIsImV4cCI6MjAxMjYxNDEzMn0._jvJu5aStMHuwhM6wSSVJ1mtUuO7HdL-WhbyEUsLUlQ"
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k"
     );
 
     if (input) {
@@ -183,5 +192,6 @@
       `).join("");
     });
   </script>
+
 </body>
 </html>
