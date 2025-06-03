@@ -14,24 +14,19 @@
       text-align: center;
       padding: 100px 20px;
     }
-
     h1 {
       font-size: 60px;
       margin-bottom: 60px;
     }
-
     .logo-container {
       margin-bottom: 50px;
     }
-
     .logo-container img {
       max-width: 350px;
       height: auto;
     }
-
     input[type="text"],
-    input[type="date"],
-    input[type="time"] {
+    input[type="datetime-local"] {
       width: 98%;
       max-width: 700px;
       padding: 28px;
@@ -40,7 +35,6 @@
       border: 1px solid #ccc;
       margin-bottom: 30px;
     }
-
     .row {
       display: flex;
       justify-content: center;
@@ -48,13 +42,11 @@
       flex-wrap: wrap;
       align-items: center;
     }
-
     .icon {
       width: 100px;
       height: 100px;
       cursor: pointer;
     }
-
     button {
       padding: 30px 70px;
       font-size: 32px;
@@ -64,12 +56,10 @@
       color: white;
       cursor: pointer;
     }
-
     .top-buttons {
       text-align: right;
       margin-bottom: 60px;
     }
-
     .top-buttons button {
       margin-left: 16px;
       font-size: 24px;
@@ -79,11 +69,9 @@
       color: #1967d2;
       border: none;
     }
-
     .car-results {
       margin-top: 60px;
     }
-
     .car-card {
       background: white;
       padding: 20px;
@@ -93,7 +81,6 @@
       box-shadow: 0 0 12px rgba(0,0,0,0.1);
       text-align: left;
     }
-
     .car-card img {
       max-width: 100%;
       border-radius: 10px;
@@ -116,12 +103,10 @@
   <input type="text" id="locationInput" placeholder="Ange plats" />
 
   <div class="row">
-    <img src="images/calendar.png" alt="Kalender" class="icon" onclick="document.getElementById('dateInput').showPicker()" />
-    <img src="images/starttid-klocka.png" alt="Starttid" class="icon" onclick="document.getElementById('timeInput').showPicker()" />
+    <img src="images/calendar.png" alt="Datum & tid" class="icon" onclick="document.getElementById('datetimeInput').showPicker()" />
   </div>
 
-  <input type="date" id="dateInput" style="display:none;" />
-  <input type="time" id="timeInput" style="display:none;" />
+  <input type="datetime-local" id="datetimeInput" style="display:none;" />
 
   <br />
 
@@ -131,8 +116,7 @@
 
   <script>
     const input = document.getElementById("locationInput");
-    const dateInput = document.getElementById("dateInput");
-    const timeInput = document.getElementById("timeInput");
+    const datetimeInput = document.getElementById("datetimeInput");
     const carResults = document.getElementById("carResults");
 
     const supabase = window.supabase.createClient(
@@ -151,31 +135,17 @@
     }
 
     function isDateInRange(selectedDate, rangeString) {
-      const monthMap = {
-        januari: '01', februari: '02', mars: '03',
-        april: '04', maj: '05', juni: '06',
-        juli: '07', augusti: '08', september: '09',
-        oktober: '10', november: '11', december: '12'
-      };
-
-      const match = rangeString.match(/(\d+)[–-](\d+)\s+(\w+)\s+(\d{4})/);
+      const match = rangeString.match(/(\d{4}-\d{2}-\d{2})\s*till\s*(\d{4}-\d{2}-\d{2})/);
       if (!match) return false;
-
-      const [, startDay, endDay, monthSv, year] = match;
-      const month = monthMap[monthSv.toLowerCase()];
-      if (!month) return false;
-
+      const start = new Date(match[1]);
+      const end = new Date(match[2]);
       const selected = new Date(selectedDate);
-      const start = new Date(`${year}-${month}-${startDay.padStart(2, '0')}`);
-      const end = new Date(`${year}-${month}-${endDay.padStart(2, '0')}`);
-
       return selected >= start && selected <= end;
     }
 
     document.getElementById("sökKnapp").addEventListener("click", async () => {
       const plats = input.value.toLowerCase();
-      const datum = dateInput.value;
-      const starttid = timeInput.value;
+      const datetime = datetimeInput.value;
 
       let { data: cars, error } = await supabase
         .from("Cars")
@@ -188,8 +158,8 @@
 
       const filtrerade = cars.filter(car => {
         const platsMatch = !plats || (car.Location && car.Location.toLowerCase().includes(plats));
-        const datumMatch = !datum || (car.Available_dates && isDateInRange(datum, car.Available_dates));
-        const tidMatch = !starttid || (car.Available_times && car.Available_times.includes(starttid));
+        const datumMatch = !datetime || (car.Available_dates && isDateInRange(datetime.split("T")[0], car.Available_dates));
+        const tidMatch = !datetime || (car.Available_times && car.Available_times.includes(datetime.split("T")[1].slice(0, 5)));
         return platsMatch && datumMatch && tidMatch;
       });
 
