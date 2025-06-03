@@ -166,8 +166,8 @@
 
       const filtrerade = cars.filter(car => {
         const platsMatch = !plats || (car.Location && car.Location.toLowerCase().includes(plats));
-        const datumMatch = !datum || (car.Available_dates && car.Available_dates.includes(datum));
-        const tidMatch = !starttid || (car.Available_times && car.Available_times.includes(starttid));
+        const datumMatch = !datum || (car.Available_dates && car.Available_dates === datum);
+        const tidMatch = !starttid || (car.Available_times && car.Available_times === starttid);
         return platsMatch && datumMatch && tidMatch;
       });
 
