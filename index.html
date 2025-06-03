@@ -5,23 +5,141 @@
   <meta charset="UTF-8" />
   <title>Sök bil</title>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0BCvW8uNDXkb6Q4uToK1Q8EpPpcEH0Vg&libraries=places"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f9fa;
+      text-align: center;
+      padding: 100px 20px;
+    }
+
+    h1 {
+      font-size: 60px;
+      margin-bottom: 60px;
+    }
+
+    .logo-container {
+      margin-bottom: 50px;
+    }
+
+    .logo-container img {
+      max-width: 350px;
+      height: auto;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="time"] {
+      width: 98%;
+      max-width: 700px;
+      padding: 28px;
+      font-size: 30px;
+      border-radius: 50px;
+      border: 1px solid #ccc;
+      margin-bottom: 30px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .icon {
+      width: 100px;
+      height: 100px;
+      cursor: pointer;
+    }
+
+    button {
+      padding: 30px 70px;
+      font-size: 32px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 50px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .top-buttons {
+      text-align: right;
+      margin-bottom: 60px;
+    }
+
+    .top-buttons button {
+      margin-left: 16px;
+      font-size: 24px;
+      padding: 16px 32px;
+      border-radius: 16px;
+      background: #e8f0fe;
+      color: #1967d2;
+      border: none;
+    }
+
+    .car-results {
+      margin-top: 60px;
+    }
+
+    .car-card {
+      background: white;
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 20px;
+      max-width: 600px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+
+    .car-card img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
 
-<div style="text-align: center; margin-top: 30px;">
-    <a href="login.html"><button style="padding: 10px 20px; font-size: 16px;">Logga in</button></a>
-    <a href="skapa-konto.html"><button style="padding: 10px 20px; font-size: 16px; margin-left: 10px;">Skapa konto</button></a>
-</div>
+  <div class="top-buttons">
+    <a href="login.html"><button>Logga in</button></a>
+    <a href="skapa-konto.html"><button>Skapa konto</button></a>
+  </div>
+
+  <div class="logo-container">
+    <img src="images/hyr-dinbil-logo.png" alt="Hyr-dinbil Logo">
+  </div>
 
   <h1>Sök bil</h1>
-  <input type="text" id="locationInput" placeholder="Ange plats" />
-  <input type="date" id="dateInput" />
-  <button id="sökKnapp">Sök</button>
-  <div id="searchResults" style="margin-top: 20px;"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.6/dist/umd/supabase.min.js"></script>
+  <input type="text" id="locationInput" placeholder="Ange plats" />
+
+  <div class="row">
+    <img src="images/calendar.png" alt="Kalender" class="icon" onclick="document.getElementById('dateInput').showPicker()" />
+    <img src="images/starttid-klocka.png" alt="Starttid" class="icon" onclick="document.getElementById('timeInput').showPicker()" />
+  </div>
+
+  <input type="date" id="dateInput" style="display:none;" />
+  <input type="time" id="timeInput" style="display:none;" />
+
+  <br />
+
+  <button id="sökKnapp">Sök</button>
+
+  <div class="car-results" id="carResults"></div>
+
   <script>
     const input = document.getElementById("locationInput");
+    const dateInput = document.getElementById("dateInput");
+    const timeInput = document.getElementById("timeInput");
+    const carResults = document.getElementById("carResults");
+
+    const supabase = window.supabase.createClient(
+      "https://yjybfntbsjkvnqlhpfin.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k"
+    );
+
     if (input) {
       const autocomplete = new google.maps.places.Autocomplete(input);
       autocomplete.addListener("place_changed", () => {
@@ -32,82 +150,65 @@
       });
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-      const supabase = window.supabase.createClient(
-        "https://yjybfntbsjkvnqlhpfin.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k"
-      );
+    function isDateInRange(selectedDate, rangeString) {
+      const monthMap = {
+        januari: '01', februari: '02', mars: '03',
+        april: '04', maj: '05', juni: '06',
+        juli: '07', augusti: '08', september: '09',
+        oktober: '10', november: '11', december: '12'
+      };
 
-      async function searchCars() {
-        const input = document.getElementById("locationInput");
-        const dateInput = document.getElementById("dateInput");
-        const resultsDiv = document.getElementById("searchResults");
+      const match = rangeString.match(/(\d+)[–-](\d+)\s+(\w+)\s+(\d{4})/);
+      if (!match) return false;
 
-        if (!input || !resultsDiv) return;
+      const [, startDay, endDay, monthSv, year] = match;
+      const month = monthMap[monthSv.toLowerCase()];
+      if (!month) return false;
 
-        const searchValue = input.value.toLowerCase().trim();
-        const dateValue = dateInput.value;
-        const selectedDate = dateValue ? new Date(dateValue) : null;
+      const selected = new Date(selectedDate);
+      const start = new Date(`${year}-${month}-${startDay.padStart(2, '0')}`);
+      const end = new Date(`${year}-${month}-${endDay.padStart(2, '0')}`);
 
-        const { data, error } = await supabase.from("Cars").select("*");
+      return selected >= start && selected <= end;
+    }
 
-        if (error) {
-          resultsDiv.innerHTML = "<p>Fel vid hämtning.</p>";
-          return;
-        }
+    document.getElementById("sökKnapp").addEventListener("click", async () => {
+      const plats = input.value.toLowerCase();
+      const datum = dateInput.value;
+      const starttid = timeInput.value;
 
-        let filtered = data.filter(car => {
-          const locationMatch = car.Location && car.Location.toLowerCase().includes(searchValue);
-          return locationMatch;
-        });
+      let { data: cars, error } = await supabase
+        .from("Cars")
+        .select("*");
 
-        if (selectedDate) {
-          filtered = filtered.filter(car => {
-            const availableStart = new Date("2025-06-01");
-            const availableEnd = new Date("2025-06-05");
-            return selectedDate >= availableStart && selectedDate <= availableEnd;
-          });
-        }
-
-        resultsDiv.innerHTML = "";
-
-        if (filtered.length === 0) {
-          resultsDiv.innerHTML = "<p>Inga bilar hittades.</p>";
-          return;
-        }
-
-        filtered.forEach(car => {
-          console.log("Model:", car.Model, "Reg:", car.Reg_number);
-          const div = document.createElement("div");
-          div.innerHTML = `
-            <div style="border: 1px solid #ccc; padding: 12px; margin-bottom: 16px; border-radius: 6px;">
-              <h3>${car.Model}</h3>
-              <img src="${car.Image_url}" width="200" />
-              <p><strong>Reg.nr:</strong> ${car.Reg_number || "Saknas"}</p>
-              <p><strong>Plats:</strong> ${car.Location}</p>
-              <p><strong>Pris:</strong> 99 kr/timme</p>
-              <details>
-                <summary>Prislista</summary>
-                <ul>
-                  <li>1 timme: 99 kr</li>
-                  <li>3 timmar: 249 kr</li>
-                  <li>12 timmar: 499 kr</li>
-                  <li>24 timmar: 899 kr</li>
-                </ul>
-              </details>
-              <p><strong>Tillgänglig:</strong> 1–5 juni 2025</p>
-              <button onclick="window.location.href='boka.html?model=${encodeURIComponent(car.Model)}&reg=${encodeURIComponent(car.Reg_number || '')}'">Boka</button>
-            </div>
-          `;
-          resultsDiv.appendChild(div);
-        });
+      if (error) {
+        carResults.innerHTML = "<p>Fel vid hämtning av bilar.</p>";
+        return;
       }
 
-      const button = document.getElementById("sökKnapp");
-      if (button) {
-        button.addEventListener("click", searchCars);
+      const filtrerade = cars.filter(car => {
+        const platsMatch = !plats || (car.Location && car.Location.toLowerCase().includes(plats));
+        const datumMatch = !datum || (car.Available_dates && isDateInRange(datum, car.Available_dates));
+        const tidMatch = !starttid || (car.Available_times && car.Available_times.includes(starttid));
+        return platsMatch && datumMatch && tidMatch;
+      });
+
+      if (filtrerade.length === 0) {
+        carResults.innerHTML = "<p>Inga bilar hittades.</p>";
+        return;
       }
+
+      carResults.innerHTML = filtrerade.map(car => `
+        <div class="car-card">
+          <h2>${car.Model}</h2>
+          <p><strong>Plats:</strong> ${car.Location}</p>
+          <p><strong>Reg.nr:</strong> ${car.Reg_number}</p>
+          <p><strong>Tillgänglig:</strong> ${car.Available_dates || "Okänt datum"}</p>
+          <img src="${car.Image_url}" alt="${car.Model}" />
+        </div>
+      `).join("");
     });
   </script>
+
 </body>
 </html>
