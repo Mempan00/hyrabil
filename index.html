@@ -3,6 +3,7 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sök bil</title>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0BCvW8uNDXkb6Q4uToK1Q8EpPpcEH0Vg&libraries=places"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -44,8 +45,15 @@
     .row {
       display: flex;
       justify-content: center;
-      gap: 40px;
+      gap: 60px;
       flex-wrap: wrap;
+      align-items: flex-start;
+      margin-bottom: 30px;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
       align-items: center;
     }
 
@@ -53,6 +61,7 @@
       width: 100px;
       height: 100px;
       cursor: pointer;
+      margin-bottom: 10px;
     }
 
     button {
@@ -116,14 +125,15 @@
   <input type="text" id="locationInput" placeholder="Ange plats" />
 
   <div class="row">
-    <img src="images/calendar.png" alt="Kalender" class="icon" onclick="document.getElementById('dateInput').focus()" />
-    <img src="images/starttid-klocka.png" alt="Starttid" class="icon" onclick="document.getElementById('timeInput').focus()" />
+    <div class="column">
+      <img src="images/calendar.png" alt="Kalender" class="icon" onclick="document.getElementById('dateInput').focus()" />
+      <input type="date" id="dateInput" />
+    </div>
+    <div class="column">
+      <img src="images/starttid-klocka.png" alt="Starttid" class="icon" onclick="document.getElementById('timeInput').focus()" />
+      <input type="time" id="timeInput" />
+    </div>
   </div>
-
-  <input type="date" id="dateInput" />
-  <input type="time" id="timeInput" />
-
-  <br />
 
   <button id="sökKnapp">Sök</button>
 
