@@ -97,7 +97,8 @@
 
       results.innerHTML = filtered.map(car => `
         <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 8px; background: #f9f9f9; display: flex; gap: 15px;">
-          <img src="${car.Image_url || 'https://via.placeholder.com/120x80?text=Ingen+bild'}" style="width: 120px; height: 80px; object-fit: cover; border-radius: 4px;" />
+          <img src="${car.Image_url || 'https://raw.githubusercontent.com/Mempan00/hyrabil/main/images/no-image.png'}"
+               style="width: 120px; height: 80px; object-fit: cover; border-radius: 4px;" />
           <div>
             <h3>${car.Model}</h3>
             <p><strong>Registreringsnummer:</strong> ${car.Reg_number}</p>
