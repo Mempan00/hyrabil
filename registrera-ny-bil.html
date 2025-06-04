@@ -42,8 +42,8 @@
     const imageFile = document.getElementById("carImage").files[0];
     const availableFrom = document.getElementById("startDate").value;
     const availableTo = document.getElementById("endDate").value;
-    const startTime = document.getElementById("startTime").value;
-    const endTime = document.getElementById("endTime").value;
+    const startTime = document.getElementById("startTime").value ? document.getElementById("startTime").value + ":00" : null;
+    const endTime = document.getElementById("endTime").value ? document.getElementById("endTime").value + ":00" : null;
 
     let imageUrl = "";
     if (imageFile) {
