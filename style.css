@@ -1,20 +1,7 @@
+
 /* Namnbyte från BILPOOLEN till Hyr-dinbil 2025-06-04 */
 body { font-family: Arial, sans-serif; padding: 20px; }
 nav { background: #fff; padding: 15px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; }
 .hero, .features { text-align: center; margin-top: 30px; }
 .features { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
 .feature-box { background: #f9f9f9; padding: 20px; border-radius: 8px; width: 250px; }
-.car-results { margin-top: 60px; }
-.car-card {
-  background: white;
-  padding: 20px;
-  margin: 20px auto;
-  border-radius: 20px;
-  max-width: 600px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.1);
-  text-align: left;
-}
-.car-card img {
-  max-width: 100%;
-  border-radius: 10px;
-}
