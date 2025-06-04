@@ -25,23 +25,17 @@
   <input type="time" id="endTime" style="font-size:18px; padding:12px;" />
 
   <h3>Prislista (kr):</h3>
-  <div id="priceList">
-    <script>
-      for (let i = 1; i <= 24; i++) {
-        document.write(`<input type="number" id="price${i}" placeholder="Pris för ${i} timme${i > 1 ? 'ar' : ''}" />`);
-      }
-    </script>
-  </div>
+  <div id="priceList"></div>
 
-  <button class="btn" onclick="uploadCar()">Lägg till bil</button>
+  <button class="btn" id="uploadCarBtn">Lägg till bil</button>
   <button class="btn" onclick="window.location.href='inloggad.html'">Tillbaka</button>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-const supabase = createClient("https://yjybfntbsjkvnqlhpfin.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k");
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+  const supabase = createClient("https://yjybfntbsjkvnqlhpfin.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k");
 
-  async function uploadCar() {
+  window.uploadCar = async function() {
     const model = document.getElementById("model").value;
     const regNum = document.getElementById("regNumber").value;
     const location = document.getElementById("location").value;
@@ -87,10 +81,18 @@ const supabase = createClient("https://yjybfntbsjkvnqlhpfin.supabase.co", "eyJhb
       alert("Bilen är nu registrerad!");
       window.location.href = "inloggad.html";
     }
-  }
+  };
 </script>
 
 <script>
+  for (let i = 1; i <= 24; i++) {
+    const input = document.createElement("input");
+    input.type = "number";
+    input.id = `price${i}`;
+    input.placeholder = `Pris för ${i} timme${i > 1 ? 'ar' : ''}`;
+    document.getElementById("priceList").appendChild(input);
+  }
+
   function initAutocomplete() {
     const input = document.getElementById("location");
     if (input) {
