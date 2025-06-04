@@ -24,7 +24,7 @@
     <button onclick="searchCars()">Sök bil</button>
   </div>
 
-  <div id="searchResults" style="margin-top: 30px;"></div>
+  <div id="searchResults" class="car-results"></div>
 
   <div class="features">
     <div class="feature-box">
@@ -44,7 +44,7 @@
   <script>
     const supabase = window.supabase.createClient(
       "https://yjybfntbsjkvnqlhpfin.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k"
     );
 
     const input = document.getElementById("locationInput");
@@ -95,15 +95,13 @@
       }
 
       results.innerHTML = filtered.map(car => `
-        <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 8px; background: #f9f9f9; display: flex; gap: 15px;">
-          <img src="${car.Image_url || 'https://via.placeholder.com/120x80?text=Ingen+bild'}" style="width: 120px; height: 80px; object-fit: cover; border-radius: 4px;" />
-          <div>
-            <h3>${car.Model}</h3>
-            <p><strong>Registreringsnummer:</strong> ${car.Reg_number}</p>
-            <p><strong>Plats:</strong> ${car.Location}</p>
-            <p><strong>Tillgänglig:</strong> ${car.available_from} – ${car.available_to}</p>
-            <p><strong>Tider:</strong> ${car.start_time} – ${car.end_time}</p>
-          </div>
+        <div class="car-card">
+          <h2>${car.Model}</h2>
+          <p><strong>Plats:</strong> ${car.Location}</p>
+          <p><strong>Reg.nr:</strong> ${car.Reg_number}</p>
+          <p><strong>Tillgänglig:</strong> ${car.available_from} – ${car.available_to}</p>
+          <p><strong>Tider:</strong> ${car.start_time} – ${car.end_time}</p>
+          <img src="${car.Image_url}" alt="${car.Model}" />
         </div>
       `).join("");
     }
