@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registrera ny bil</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0BCvW8uNDXkb6Q4uToK1Q8EpPpcEH0Vg&libraries=places"></script>
 </head>
 <body>
@@ -14,96 +15,99 @@
   <input type="text" id="model" placeholder="Bilmodell" />
   <input type="text" id="location" placeholder="Plats" />
   <input type="text" id="regNumber" placeholder="Registreringsnummer" />
-  <input type="date" id="startDate" style="font-size:18px; padding:12px;" />
-  <input type="date" id="endDate" style="font-size:18px; padding:12px;" />
-  <label class="checkbox-container" style="margin-top:10px;"><input type="checkbox" id="repeatMonthly" /> Upprepa dagarna varje månad</label>
-  <input type="time" id="startTime" style="font-size:18px; padding:12px;" />
-  <input type="time" id="endTime" style="font-size:18px; padding:12px;" />
+  <input type="date" id="startDate" />
+  <input type="date" id="endDate" />
+  <label><input type="checkbox" id="repeatMonthly" /> Upprepa dagarna varje månad</label>
+  <input type="time" id="startTime" />
+  <input type="time" id="endTime" />
 
   <h3>Prislista (kr):</h3>
-  <div id="priceList">
-    <input type="number" id="price1" placeholder="Pris för 1 timme" />
-<input type="number" id="price2" placeholder="Pris för 2 timmear" />
-<input type="number" id="price3" placeholder="Pris för 3 timmear" />
-<input type="number" id="price4" placeholder="Pris för 4 timmear" />
-<input type="number" id="price5" placeholder="Pris för 5 timmear" />
-<input type="number" id="price6" placeholder="Pris för 6 timmear" />
-<input type="number" id="price7" placeholder="Pris för 7 timmear" />
-<input type="number" id="price8" placeholder="Pris för 8 timmear" />
-<input type="number" id="price9" placeholder="Pris för 9 timmear" />
-<input type="number" id="price10" placeholder="Pris för 10 timmear" />
-<input type="number" id="price11" placeholder="Pris för 11 timmear" />
-<input type="number" id="price12" placeholder="Pris för 12 timmear" />
-<input type="number" id="price13" placeholder="Pris för 13 timmear" />
-<input type="number" id="price14" placeholder="Pris för 14 timmear" />
-<input type="number" id="price15" placeholder="Pris för 15 timmear" />
-<input type="number" id="price16" placeholder="Pris för 16 timmear" />
-<input type="number" id="price17" placeholder="Pris för 17 timmear" />
-<input type="number" id="price18" placeholder="Pris för 18 timmear" />
-<input type="number" id="price19" placeholder="Pris för 19 timmear" />
-<input type="number" id="price20" placeholder="Pris för 20 timmear" />
-<input type="number" id="price21" placeholder="Pris för 21 timmear" />
-<input type="number" id="price22" placeholder="Pris för 22 timmear" />
-<input type="number" id="price23" placeholder="Pris för 23 timmear" />
-<input type="number" id="price24" placeholder="Pris för 24 timmear" />
+  <div id="priceList"></div>
 
-  </div>
-
-  <button class="btn" id="uploadCarBtn" onclick="window.uploadCar()">Lägg till bil</button>
+  <button class="btn" id="uploadCarBtn">Lägg till bil</button>
   <button class="btn" onclick="window.location.href='inloggad.html'">Tillbaka</button>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-const supabase = createClient("https://yjybfntbsjkvnqlhpfin.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k");
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+  const supabase = createClient("https://yjybfntbsjkvnqlhpfin.supabase.co", 
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k");
 
-window.uploadCar = async function() {
-  const model = document.getElementById("model").value;
-  const regNum = document.getElementById("regNumber").value;
-  const location = document.getElementById("location").value;
-  const imageFile = document.getElementById("carImage").files[0];
-  const availableFrom = document.getElementById("startDate").value || null;
-  const availableTo = document.getElementById("endDate").value || null;
-  const startTime = document.getElementById("startTime").value || null;
-  const endTime = document.getElementById("endTime").value || null;
+  window.uploadCar = async function() {
+    const model = document.getElementById("model").value;
+    const regNum = document.getElementById("regNumber").value;
+    const location = document.getElementById("location").value;
+    const imageFile = document.getElementById("carImage").files[0];
+    const availableFrom = document.getElementById("startDate").value;
+    const availableTo = document.getElementById("endDate").value;
+    const startTime = document.getElementById("startTime").value;
+    const endTime = document.getElementById("endTime").value;
 
-  let imageUrl = "";
-  if (imageFile) {
-    const fileExt = imageFile.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `cars/${fileName}`;
+    let imageUrl = "";
+    if (imageFile) {
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `cars/${fileName}`;
 
-    let { data, error } = await supabase.storage.from("images").upload(filePath, imageFile);
-    if (error) {
-      console.error("Fel vid uppladdning av bild:", error.message);
-      return;
+      let { error } = await supabase.storage.from("images").upload(filePath, imageFile);
+      if (error) {
+        console.error("Fel vid uppladdning av bild:", error.message);
+        return;
+      }
+
+      const { data: publicUrlData } = supabase.storage.from("images").getPublicUrl(filePath);
+      imageUrl = publicUrlData.publicUrl;
     }
 
-    const { data: publicUrlData } = supabase.storage.from("images").getPublicUrl(filePath);
-    imageUrl = publicUrlData.publicUrl;
+    const { error: insertError } = await supabase
+      .from("Cars")
+      .insert([{
+        Model: model,
+        Reg_number: regNum,
+        Location: location,
+        Image_url: imageUrl,
+        available_from: availableFrom,
+        available_to: availableTo,
+        Start_time: startTime,
+        End_time: endTime
+      }]);
+
+    if (insertError) {
+      console.error("Fel vid sparande i Supabase:", insertError.message);
+      alert("Kunde inte spara bilen.");
+    } else {
+      alert("Bilen är nu registrerad!");
+      window.location.href = "inloggad.html";
+    }
+  };
+</script>
+
+<script>
+  for (let i = 1; i <= 24; i++) {
+    const input = document.createElement("input");
+    input.type = "number";
+    input.id = `price${i}`;
+    input.placeholder = `Pris för ${i} timme${i > 1 ? 'ar' : ''}`;
+    document.getElementById("priceList").appendChild(input);
   }
 
-  const { error: insertError } = await supabase
-    .from("Cars")
-    .insert([{
-      Model: model,
-      Reg_number: regNum,
-      Location: location,
-      Image_url: imageUrl,
-      available_from: availableFrom,
-      available_to: availableTo,
-      Start_time: startTime,
-      End_time: endTime
-    }]);
-
-  if (insertError) {
-    console.error("Fel vid sparande i Supabase:", insertError.message);
-    alert("Kunde inte spara bilen.");
-  } else {
-    alert("Bilen är nu registrerad!");
-    window.location.href = "inloggad.html";
+  function initAutocomplete() {
+    const input = document.getElementById("location");
+    if (input) {
+      new google.maps.places.Autocomplete(input, {
+        types: ["geocode"],
+        componentRestrictions: { country: "se" }
+      });
+    }
   }
-};
+
+  window.addEventListener("load", () => {
+    if (window.google && google.maps && google.maps.places) {
+      initAutocomplete();
+    } else {
+      setTimeout(initAutocomplete, 1000);
+    }
+  });
 </script>
 
 </body>
