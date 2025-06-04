@@ -1,0 +1,52 @@
+
+.main-container {
+    padding-top: 80px;
+}
+
+
+
+    body { font-family: sans-serif; background: #f6f6f6; padding: 20px; }
+    input, button { display: block; margin: 10px 0; padding: 10px; width: 100%; max-width: 400px; }
+    .btn { background-color: #e5d8c3; color: #000; border: none; border-radius: 6px; cursor: pointer; }
+  
+
+input#endTime { font-size:18px; padding:12px; }
+
+
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        nav { background: #fff; padding: 15px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; }
+        .hero, .features { text-align: center; margin-top: 30px; }
+        .features { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .feature-box { background: #f9f9f9; padding: 20px; border-radius: 8px; width: 250px; }
+    
+
+
+    body { font-family: sans-serif; background: #f6f6f6; padding: 20px; }
+    .btn { background-color: #e5d8c3; color: #000; padding: 10px; border: none; border-radius: 6px; margin-bottom: 10px; cursor: pointer; }
+    .card { background: white; padding: 15px; margin-top: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .form-section { display: none; margin-top: 10px; }
+    .form-section.active { display: block; }
+    .form-input { display: block; margin: 8px 0; padding: 8px; width: 100%; max-width: 400px; }
+    .checkbox-container { display: flex; align-items: center; gap: 6px; margin: 10px 0; }
+  
+
+input#startDate { font-size:18px; padding:12px; }
+
+a { position: absolute; top: 20px; left: 20px; text-decoration: none; }
+
+input#endDate { font-size:18px; padding:12px; }
+
+label.checkbox-container { margin-top:10px; }
+
+button { padding: 6px 12px; }
+
+
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    input { padding: 8px; margin: 6px 0; width: 250px; }
+    button { padding: 10px 20px; }
+    #meddelande { margin-top: 20px; color: red; }
+  
+
+input#startTime { font-size:18px; padding:12px; }
+
+div#searchResults { margin-top: 30px; }
