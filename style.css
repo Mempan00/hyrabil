@@ -1,0 +1,6 @@
+
+body { font-family: Arial, sans-serif; padding: 20px; }
+nav { background: #fff; padding: 15px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; }
+.hero, .features { text-align: center; margin-top: 30px; }
+.features { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+.feature-box { background: #f9f9f9; padding: 20px; border-radius: 8px; width: 250px; }
