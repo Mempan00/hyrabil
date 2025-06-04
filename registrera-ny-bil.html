@@ -2,113 +2,79 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registrera ny bil</title>
-  <style>
-    body { font-family: sans-serif; background: #f6f6f6; padding: 20px; }
-    input, button { display: block; margin: 10px 0; padding: 10px; width: 100%; max-width: 400px; }
-    .btn { background-color: #e5d8c3; color: #000; border: none; border-radius: 6px; cursor: pointer; }
-  </style>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0BCvW8uNDXkb6Q4uToK1Q8EpPpcEH0Vg&libraries=places"></script>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
   <h1>Registrera ny bil</h1>
+  <form onsubmit="event.preventDefault(); uploadCar();">
+    <input type="text" id="model" placeholder="Modell" required><br>
+    <input type="text" id="regNum" placeholder="Registreringsnummer" required><br>
+    <input type="text" id="location" placeholder="Plats" required><br>
+    <input type="date" id="available_from" required><br>
+    <input type="date" id="available_to" required><br>
+    <input type="time" id="start_time" required><br>
+    <input type="time" id="end_time" required><br>
+    <input type="file" id="image" accept="image/*"><br>
+    <button type="submit">Registrera bil</button>
+  </form>
 
-  <input type="file" id="carImage" accept="image/*" />
-  <input type="text" id="model" placeholder="Bilmodell" />
-  <input type="text" id="location" placeholder="Plats" />
-  <input type="text" id="regNumber" placeholder="Registreringsnummer" />
-  <input type="date" id="startDate" style="font-size:18px; padding:12px;" />
-  <input type="date" id="endDate" style="font-size:18px; padding:12px;" />
-  <label class="checkbox-container" style="margin-top:10px;"><input type="checkbox" id="repeatMonthly" /> Upprepa dagarna varje månad</label>
-  <input type="time" id="startTime" style="font-size:18px; padding:12px;" />
-  <input type="time" id="endTime" style="font-size:18px; padding:12px;" />
+  <script>
+    const supabase = window.supabase.createClient(
+      "https://yjybfntbsjkvnqlhpfin.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    );
 
-  <h3>Prislista (kr):</h3>
-  <div id="priceList">
-    <script>
-      for (let i = 1; i <= 24; i++) {
-        document.write(`<input type="number" id="price${i}" placeholder="Pris för ${i} timme${i > 1 ? 'ar' : ''}" />`);
+    async function uploadCar() {
+      const model = document.getElementById('model').value;
+      const regNum = document.getElementById('regNum').value;
+      const location = document.getElementById('location').value;
+      const available_from = document.getElementById('available_from').value;
+      const available_to = document.getElementById('available_to').value;
+      const Start_time = document.getElementById('start_time').value;
+      const End_time = document.getElementById('end_time').value;
+      const imageInput = document.getElementById('image');
+
+      let imageUrl = '';
+      if (imageInput.files.length > 0) {
+        const file = imageInput.files[0];
+        const { data, error } = await supabase.storage
+          .from('bilar')
+          .upload(`images/${Date.now()}_${file.name}`, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (error) {
+          alert('Kunde inte ladda upp bilden.');
+          return;
+        }
+
+        imageUrl = `https://yjybfntbsjkvnqlhpfin.supabase.co/storage/v1/object/public/bilar/${data.path}`;
       }
-    </script>
-  </div>
 
-  <button class="btn" onclick="uploadCar()">Lägg till bil</button>
-  <button class="btn" onclick="window.location.href='inloggad.html'">Tillbaka</button>
+      const { error } = await supabase.from('Cars').insert([
+        {
+          Model: model,
+          Reg_number: regNum,
+          Location: location,
+          available_from,
+          available_to,
+          Start_time,
+          End_time,
+          Image_url: imageUrl
+        }
+      ]);
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-const supabase = createClient("https://yjybfntbsjkvnqlhpfin.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k");
-
-  async function uploadCar() {
-    const model = document.getElementById("model").value;
-    const regNum = document.getElementById("regNumber").value;
-    const location = document.getElementById("location").value;
-    const imageFile = document.getElementById("carImage").files[0];
-    const availableFrom = document.getElementById("startDate").value;
-    const availableTo = document.getElementById("endDate").value;
-    const startTime = document.getElementById("startTime").value;
-    const endTime = document.getElementById("endTime").value;
-
-    let imageUrl = "";
-    if (imageFile) {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `cars/${fileName}`;
-
-      let { data, error } = await supabase.storage.from("images").upload(filePath, imageFile);
       if (error) {
-        console.error("Fel vid uppladdning av bild:", error.message);
-        return;
+        alert('Fel vid sparning: ' + error.message);
+      } else {
+        alert('Bil registrerad!');
+        window.location.href = "inloggad.html";
       }
-
-      const { data: publicUrlData } = supabase.storage.from("images").getPublicUrl(filePath);
-      imageUrl = publicUrlData.publicUrl;
     }
-
-    const { error: insertError } = await supabase
-      .from("Cars")
-      .insert([{
-        Model: model,
-        Reg_number: regNum,
-        Location: location,
-        Image_url: imageUrl,
-        available_from: availableFrom,
-        available_to: availableTo,
-        start_time: startTime,
-        end_time: endTime
-      }]);
-
-    if (insertError) {
-      console.error("Fel vid sparande i Supabase:", insertError.message);
-      alert("Kunde inte spara bilen.");
-    } else {
-      alert("Bilen är nu registrerad!");
-      window.location.href = "inloggad.html";
-    }
-  }
-</script>
-
-<script>
-  function initAutocomplete() {
-    const input = document.getElementById("location");
-    if (input) {
-      new google.maps.places.Autocomplete(input, {
-        types: ["geocode"],
-        componentRestrictions: { country: "se" }
-      });
-    }
-  }
-
-  window.addEventListener("load", () => {
-    if (window.google && google.maps && google.maps.places) {
-      initAutocomplete();
-    } else {
-      setTimeout(initAutocomplete, 1000);
-    }
-  });
-</script>
-
+  </script>
 </body>
 </html>
