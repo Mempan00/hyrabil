@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -54,6 +53,12 @@
 
     new google.maps.places.Autocomplete(input);
 
+    function formatTime(timeStr) {
+      if (!timeStr) return "";
+      const [hh, mm] = timeStr.split(":");
+      return `${hh}:${mm}`;
+    }
+
     async function searchCars() {
       const plats = input.value.toLowerCase();
       const datetimeStr = datetimeInput.value;
@@ -103,8 +108,8 @@
             <h3>${car.Model}</h3>
             <p><strong>Registreringsnummer:</strong> ${car.Reg_number}</p>
             <p><strong>Plats:</strong> ${car.Location}</p>
-            <p><strong>Tillgänglig:</strong> ${car.available_from} – ${car.available_to}</p>
-            <p><strong>Tider:</strong> ${car.Start_time} – ${car.End_time}</p>
+            <p><strong>Tillgänglig:</strong> ${car.available_from || ""} – ${car.available_to || ""}</p>
+            <p><strong>Tider:</strong> ${formatTime(car.Start_time)} – ${formatTime(car.End_time)}</p>
           </div>
         </div>
       `).join("");
