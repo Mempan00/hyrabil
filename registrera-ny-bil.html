@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -27,23 +28,32 @@
   <h3>Prislista (kr):</h3>
   <div id="priceList"></div>
 
-  <button class="btn" onclick="uploadCar()">Lägg till bil</button>
+  <button class="btn" id="uploadCarBtn" onclick="uploadCar()">Lägg till bil</button>
   <button class="btn" onclick="window.location.href='inloggad.html'">Tillbaka</button>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-  const supabase = createClient("https://yjybfntbsjkvnqlhpfin.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k");
+<script>
+  const supabase = supabase.createClient("https://yjybfntbsjkvnqlhpfin.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqeWJmbnRic2prdm5xbGhwZmluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MjA2MDUsImV4cCI6MjA2NDI5NjYwNX0.tRio5uM_QNvTbifB-ZAE-ehdX6SFNRHN0e1c5-bC_3k");
 
-  window.uploadCar = async function() {
+  async function uploadCar() {
     const model = document.getElementById("model").value;
     const regNum = document.getElementById("regNumber").value;
     const location = document.getElementById("location").value;
     const imageFile = document.getElementById("carImage").files[0];
-    const availableFrom = document.getElementById("startDate").value;
-    const availableTo = document.getElementById("endDate").value;
-    const startTime = document.getElementById("startTime").value ? document.getElementById("startTime").value + ":00" : null;
-    const endTime = document.getElementById("endTime").value ? document.getElementById("endTime").value + ":00" : null;
+    const startTime = document.getElementById("startTime").value;
+    const endTime = document.getElementById("endTime").value;
+
+    const availableFromRaw = document.getElementById("startDate").value;
+    const availableToRaw = document.getElementById("endDate").value;
+
+    if (!availableFromRaw || !availableToRaw) {
+      alert("Du måste fylla i både start- och slutdatum.");
+      return;
+    }
+
+    const availableFrom = new Date(availableFromRaw).toISOString().split("T")[0];
+    const availableTo = new Date(availableToRaw).toISOString().split("T")[0];
 
     let imageUrl = "";
     if (imageFile) {
@@ -51,40 +61,33 @@
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `cars/${fileName}`;
 
-      let { data, error } = await supabase.storage.from("images").upload(filePath, imageFile);
+      const { data, error } = await supabase.storage.from("images").upload(filePath, imageFile);
       if (error) {
-        console.error("Fel vid uppladdning av bild:", error.message);
+        alert("Fel vid uppladdning av bild.");
         return;
       }
-
-      const { data: publicUrlData } = supabase.storage.from("images").getPublicUrl(filePath);
-      imageUrl = publicUrlData.publicUrl;
+      imageUrl = supabase.storage.from("images").getPublicUrl(filePath).data.publicUrl;
     }
 
-    const { error: insertError } = await supabase
-      .from("Cars")
-      .insert([{
-        Model: model,
-        Reg_number: regNum,
-        Location: location,
-        Image_url: imageUrl,
-        available_from: availableFrom,
-        available_to: availableTo,
-        Start_time: startTime,
-        End_time: endTime
-      }]);
+    const { error: insertError } = await supabase.from("Cars").insert([{
+      Model: model,
+      Reg_number: regNum,
+      Location: location,
+      Image_url: imageUrl,
+      available_from: availableFrom,
+      available_to: availableTo,
+      Start_time: startTime,
+      End_time: endTime
+    }]);
 
     if (insertError) {
-      console.error("Fel vid sparande i Supabase:", insertError.message);
       alert("Kunde inte spara bilen.");
     } else {
       alert("Bilen är nu registrerad!");
       window.location.href = "inloggad.html";
     }
-  };
-</script>
+  }
 
-<script>
   for (let i = 1; i <= 24; i++) {
     const input = document.createElement("input");
     input.type = "number";
@@ -111,6 +114,5 @@
     }
   });
 </script>
-
 </body>
 </html>
